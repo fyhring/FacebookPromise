@@ -1,0 +1,68 @@
+<script src="jquery-latest.min.js"></script>
+<script src="facebookpromise.js"></script>
+<script>
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+
+    /**
+     * Add your APP ID here.
+     */
+    var app_id = 1234567890;
+
+
+    var fb = new FacebookPromise(app_id);
+
+    fb.ready(function() {
+        console.log('Facebook JS SDK is ready!');
+
+        if (fb.status == FacebookStatus.CONNECTED) {
+
+            fb.me()
+                    .done(function(resp)
+                    {
+                        console.log(resp);
+                    })
+                    .fail(function(error)
+                    {
+                        console.error(error);
+                    });
+        } else {
+            // Don't use the native confirm box, use something with an actual button. (This is to prevent popup blocking)
+            var plz = confirm('You must login to use our service, would you like to login now?');
+            if (plz) {
+                setTimeout(onClickLoginBtn, 500);
+            } else {
+                alert('Very well then..');
+                window.location.assign('https://google.com');
+            }
+        }
+    });
+
+    var onClickLoginBtn = function() {
+        fb.login().done(handleLoginSuccess).fail(handleLoginFailure);
+    };
+
+    var handleLoginSuccess = function(resp) {
+        console.log(resp, fb.accessToken);
+    };
+
+    var handleLoginFailure = function(error) {
+        console.error(error);
+    };
+
+
+
+    $(document).ready(function() {
+        $('#loginBtn').on('click', onClickLoginBtn);
+    });
+
+</script>
+<div id="fb-root"></div>
+
+<button id="loginBtn">Login with Facebook</button>
